@@ -1,6 +1,6 @@
-# stm32-ssd1306
+# at32-ssd1306
 
-STM32 library for working with OLEDs based on SSD1306, supports I2C and 4-wire SPI.
+AT32 library for working with OLEDs based on SSD1306, supports I2C and 4-wire SPI.
 It also works with SH1106, SH1107 and SSD1309 which are compatible with SSD1306.
 
 A [detailed video-tutorial](https://www.youtube.com/watch?v=z1Px6emHIeg) is available on

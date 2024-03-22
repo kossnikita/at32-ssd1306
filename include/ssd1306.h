@@ -5,8 +5,8 @@
  * https://github.com/afiskon/stm32-ssd1306
  */
 
-#ifndef __SSD1306_H__
-#define __SSD1306_H__
+#ifndef SSD1306_H
+#define SSD1306_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -199,4 +199,4 @@ SSD1306_Error_t ssd1306_FillBuffer(uint8_t* buf, uint32_t len);
 
 _END_STD_C
 
-#endif // __SSD1306_H__
+#endif /* SSD1306_H */

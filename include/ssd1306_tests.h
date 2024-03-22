@@ -1,5 +1,5 @@
-#ifndef __SSD1306_TEST_H__
-#define __SSD1306_TEST_H__
+#ifndef SSD1306_TESTS_H
+#define SSD1306_TESTS_H
 
 #include <_ansi.h>
 
@@ -20,4 +20,4 @@ void ssd1306_TestDrawBitmap(void);
 
 _END_STD_C
 
-#endif // __SSD1306_TEST_H__
+#endif /* SSD1306_TESTS_H */
