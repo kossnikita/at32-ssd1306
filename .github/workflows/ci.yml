@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: apt packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install cppcheck
+    - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
+      uses: carlosperate/arm-none-eabi-gcc-action@v1
+      with:
+        release: 'latest'
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Cppcheck
+      run: cppcheck --enable=warning --platform=arm32-wchar_t4.xml --std=c++20 -I./include/ -i./build/ -DSTM32F411xE=1 --library=gnu.cfg --error-exitcode=1 ${{github.workspace}}
