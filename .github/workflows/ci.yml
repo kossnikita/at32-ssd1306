@@ -42,7 +42,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          path: ssd1306
+          path: libs/ssd1306
       - name: Checkout Artery ${{ matrix.name }} Firmware Library
         uses: actions/checkout@v4
         with:
@@ -50,10 +50,9 @@ jobs:
           path: firmware
       - name: Configure project
         run: |
-          mkdir libs
           cp -r firmware/libraries/* ./libs/
           find firmware -wholename */templates/inc/at32*_conf.h -exec cp '{}' . \;
-          cp ssd1306/.github/workflows/makefile .
+          cp libs/ssd1306/.github/workflows/makefile .
           ls -fl
       - name: Make
         env:
