@@ -32,6 +32,8 @@ jobs:
           - {
               name: AT32A403A,
               git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
             }
 
     steps:
@@ -48,4 +50,14 @@ jobs:
           path: firmware
       - name: Configure project
         run: |
+          mkdir libs
+          cp -r firmware/libraries/* ./libs/
+          find firmware -wholename */templates/inc/at32*_conf.h -exec cp '{}' . \;
+          cp ssd1306/.github/workflows/makefile .
           ls -fl
+      - name: Make
+        env:
+          MCU: ${{ matrix.mcu }}
+          LDSCRIPT: ${{ matrix.ldscript }}
+        run: |
+          make i2c
