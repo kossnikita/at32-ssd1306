@@ -18,12 +18,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install cppcheck
-      - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
-        uses: carlosperate/arm-none-eabi-gcc-action@v1
+      # - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
+      #   uses: carlosperate/arm-none-eabi-gcc-action@v1
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Cppcheck
-        run: cppcheck --enable=warning --platform=arm32-wchar_t4.xml --std=c++20 -I./include/ -i./build/ -DAT32F421=1 --library=gnu.cfg --error-exitcode=1 ${{github.workspace}}
+        run: cppcheck --enable=warning --platform=arm32-wchar_t4.xml --std=c++20 -I./include/ -i./build/ -DAT32F421=1 -DSSD1306_USE_SPI --library=gnu.cfg --error-exitcode=1 ${{github.workspace}}
   ci:
     runs-on: ubuntu-latest
     strategy:
