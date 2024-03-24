@@ -36,10 +36,82 @@ jobs:
               ldscript: AT32A403AxC_FLASH.ld,
             }
           - {
+              name: AT32F402,
+              git: ArteryTek/AT32F402_405_Firmware_Library,
+              mcu: AT32F402RCT7,
+              ldscript: AT32F402xC_FLASH.ld,
+            }
+          - {
+              name: AT32F403,
+              git: ArteryTek/AT32F403_Firmware_Library,
+              mcu: AT32F403ZGT6,
+              ldscript: AT32F403xG_FLASH.ld,
+            }
+          - {
+              name: AT32F403A,
+              git: ArteryTek/AT32F403A_407_Firmware_Library,
+              mcu: AT32F403AVGT7,
+              ldscript: AT32F403AxG_FLASH.ld,
+            }
+          - {
+              name: AT32F405,
+              git: ArteryTek/AT32F402_405_Firmware_Library,
+              mcu: AT32F405RCT7,
+              ldscript: AT32F405xC_FLASH.ld,
+            }
+          - {
+              name: AT32F407,
+              git: ArteryTek/AT32F403A_407_Firmware_Library,
+              mcu: AT32F407VGT7,
+              ldscript: AT32F407xG_FLASH.ld,
+            }
+          - {
+              name: AT32F413,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
+            }
+          - {
+              name: AT32F415,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
+            }
+          - {
               name: AT32F421,
               git: ArteryTek/AT32F421_Firmware_Library,
               mcu: AT32F421C8T7,
               ldscript: AT32F421x8_FLASH.ld,
+            }
+          - {
+              name: AT32F423,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
+            }
+          - {
+              name: AT32F425,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
+            }
+          - {
+              name: AT32F435,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
+            }
+          - {
+              name: AT32F437,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
+            }
+          - {
+              name: AT32WB415,
+              git: ArteryTek/AT32A403A_Firmware_Library,
+              mcu: AT32A403AVCT7,
+              ldscript: AT32A403AxC_FLASH.ld,
             }
 
     steps:
@@ -60,10 +132,15 @@ jobs:
           find firmware -wholename */templates/inc/at32*_conf.h -exec cp '{}' . \;
           cp libs/ssd1306/.github/workflows/makefile .
           ls -fl
-      - name: Make
+      - name: Build I2C
         env:
           NAME: ${{ matrix.name }}
           MCU: ${{ matrix.mcu }}
           LDSCRIPT: ${{ matrix.ldscript }}
-        run: |
-          make i2c
+        run: make i2c
+      - name: Build SPI
+        env:
+          NAME: ${{ matrix.name }}
+          MCU: ${{ matrix.mcu }}
+          LDSCRIPT: ${{ matrix.ldscript }}
+        run: make spi
