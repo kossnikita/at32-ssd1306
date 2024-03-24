@@ -35,6 +35,12 @@ jobs:
               mcu: AT32A403AVCT7,
               ldscript: AT32A403AxC_FLASH.ld,
             }
+          - {
+              name: AT32F421,
+              git: ArteryTek/AT32F421_Firmware_Library,
+              mcu: AT32F421C8T7,
+              ldscript: AT32F421x8_FLASH.ld,
+            }
 
     steps:
       - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
