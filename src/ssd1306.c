@@ -49,37 +49,34 @@ void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
 
 void ssd1306_Reset(void) {
   // CS = High (not selected)
-  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_SET);
+  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, TRUE);
 
   // Reset the OLED
-  gpio_bits_write(SSD1306_Reset_Port, SSD1306_Reset_Pin, GPIO_PIN_RESET);
+  gpio_bits_write(SSD1306_Reset_Port, SSD1306_Reset_Pin, FALSE);
   ssd1306_Delay(10);
-  gpio_bits_write(SSD1306_Reset_Port, SSD1306_Reset_Pin, GPIO_PIN_SET);
+  gpio_bits_write(SSD1306_Reset_Port, SSD1306_Reset_Pin, TRUE);
   ssd1306_Delay(10);
 }
 
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
-  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin,
-                  GPIO_PIN_RESET);  // select OLED
-  gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_RESET);  // command
+  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, FALSE);  // select OLED
+  gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, FALSE);  // command
   while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET);
   spi_i2s_data_transmit(SSD1306_SPI_PORT, (uint16_t)byte);
   gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin,
-                  GPIO_PIN_SET);  // un-select OLED
+                  TRUE);  // un-select OLED
 }
 
 // Send data
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
-  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin,
-                  GPIO_PIN_RESET);  // select OLED
-  gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_SET);  // data
+  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, FALSE);  // select OLED
+  gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, TRUE);  // data
   for (uint32_t i = 0; i < buff_size; i++) {
-    while (spi_i2s_flag_get(&SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET);
-    spi_i2s_data_transmit(&SSD1306_SPI_PORT, (uint16_t)buffer[i]);
+    while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET);
+    spi_i2s_data_transmit(SSD1306_SPI_PORT, (uint16_t)buffer[i]);
   }
-  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin,
-                  GPIO_PIN_SET);  // un-select OLED
+  gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, TRUE);  // un-select OLED
 }
 
 #else

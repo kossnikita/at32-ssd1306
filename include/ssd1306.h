@@ -17,7 +17,9 @@ _BEGIN_STD_C
 #include "ssd1306_conf.h"
 
 
-#if defined(AT32F421)
+#if defined(AT32A403A)
+#include "at32a403a_conf.h"
+#elif defined(AT32F421)
 #include "at32f421_conf.h"
 #else
 #error "SSD1306 library was tested only on AT32F4 MCU families. Please modify ssd1306.h if you know what you are doing. Also please send a pull request if it turns out the library works on other MCU's as well!"
@@ -95,7 +97,8 @@ _BEGIN_STD_C
 #define SSD1306_BUFFER_SIZE   SSD1306_WIDTH * SSD1306_HEIGHT / 8
 #endif
 
-#define ssd1306_Delay(x) void(0)
+#define ssd1306_Delay(x) ((void)0)
+#define ssd1306_GetTick() 0
 
 // Enumeration for screen colors
 typedef enum {

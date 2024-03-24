@@ -217,7 +217,7 @@ void ssd1306_TestFonts3() {
 void ssd1306_TestFPS() {
     ssd1306_Fill(White);
    
-    uint32_t start = HAL_GetTick();
+    uint32_t start = ssd1306_GetTick();
     uint32_t end = start;
     int fps = 0;
     char message[] = "ABCDEFGHIJK";
@@ -237,7 +237,7 @@ void ssd1306_TestFPS() {
         message[sizeof(message)-2] = ch;
 
         fps++;
-        end = HAL_GetTick();
+        end = ssd1306_GetTick();
     } while((end - start) < 5000);
    
     ssd1306_Delay(5000);
