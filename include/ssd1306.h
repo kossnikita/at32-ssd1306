@@ -19,26 +19,37 @@ _BEGIN_STD_C
 
 #if defined(AT32A403A)
 #include "at32a403a_conf.h"
+#define I2C_VERSION 1
 #elif defined(AT32F402) || defined(AT32F405)
 #include "at32f402_405_conf.h"
+#define I2C_VERSION 2
 #elif defined(AT32F403)
 #include "at32f403_conf.h"
+#define I2C_VERSION 1
 #elif defined(AT32F403A) || defined(AT32F407)
 #include "at32f403a_407_conf.h"
+#define I2C_VERSION 1
 #elif defined(AT32F413)
 #include "at32f413_conf.h"
+#define I2C_VERSION 1
 #elif defined(AT32F415)
 #include "at32f415_conf.h"
+#define I2C_VERSION 1
 #elif defined(AT32F421)
 #include "at32f421_conf.h"
+#define I2C_VERSION 1
 #elif defined(AT32F423)
 #include "at32f423_conf.h"
+#define I2C_VERSION 2
 #elif defined(AT32F425)
 #include "at32f425_conf.h"
+#define I2C_VERSION 2
 #elif defined(AT32F435) || defined(AT32F437)
 #include "at32f435_437_conf.h"
-#elif defined(AT32wb415)
+#define I2C_VERSION 2
+#elif defined(AT32WB415)
 #include "at32wb415_conf.h"
+#define I2C_VERSION 1
 #else
 #error "SSD1306 library was tested only on AT32F4 MCU families. Please modify ssd1306.h if you know what you are doing. Also please send a pull request if it turns out the library works on other MCU's as well!"
 #endif

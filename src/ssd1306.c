@@ -10,6 +10,7 @@ void ssd1306_Reset(void) { /* for I2C - do nothing */ }
 
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
+#if I2C_VERSION == 1
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) == RESET);
   i2c_master_receive_ack_set(SSD1306_I2C_PORT, I2C_MASTER_ACK_CURRENT);
   i2c_start_generate(SSD1306_I2C_PORT);
@@ -22,10 +23,14 @@ void ssd1306_WriteCommand(uint8_t byte) {
   i2c_data_send(SSD1306_I2C_PORT, byte);
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET);
   i2c_stop_generate(SSD1306_I2C_PORT);
+#elif I2C_VERSION == 2
+  (void)(byte);
+#endif
 }
 
 // Send data
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
+#if I2C_VERSION == 1
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) == RESET);
   i2c_master_receive_ack_set(SSD1306_I2C_PORT, I2C_MASTER_ACK_CURRENT);
   i2c_start_generate(SSD1306_I2C_PORT);
@@ -43,6 +48,10 @@ void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
   }
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET);
   i2c_stop_generate(SSD1306_I2C_PORT);
+#elif I2C_VERSION == 2
+  (void)(buffer);
+  (void)(buff_size);
+#endif
 }
 
 #elif defined(SSD1306_USE_SPI)
@@ -71,7 +80,7 @@ void ssd1306_WriteCommand(uint8_t byte) {
 // Send data
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
   gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, FALSE);  // select OLED
-  gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, TRUE);  // data
+  gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, TRUE);   // data
   for (uint32_t i = 0; i < buff_size; i++) {
     while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET);
     spi_i2s_data_transmit(SSD1306_SPI_PORT, (uint16_t)buffer[i]);

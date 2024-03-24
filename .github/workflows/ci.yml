@@ -34,84 +34,112 @@ jobs:
               git: ArteryTek/AT32A403A_Firmware_Library,
               mcu: AT32A403AVCT7,
               ldscript: AT32A403AxC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F402,
               git: ArteryTek/AT32F402_405_Firmware_Library,
               mcu: AT32F402RCT7,
               ldscript: AT32F402xC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F403,
               git: ArteryTek/AT32F403_Firmware_Library,
               mcu: AT32F403ZGT6,
               ldscript: AT32F403xG_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F403A,
               git: ArteryTek/AT32F403A_407_Firmware_Library,
               mcu: AT32F403AVGT7,
               ldscript: AT32F403AxG_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F405,
               git: ArteryTek/AT32F402_405_Firmware_Library,
               mcu: AT32F405RCT7,
               ldscript: AT32F405xC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F407,
               git: ArteryTek/AT32F403A_407_Firmware_Library,
               mcu: AT32F407VGT7,
               ldscript: AT32F407xG_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F413,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32F413_Firmware_Library,
+              mcu: AT32F413RCT7,
+              ldscript: AT32F413xC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F415,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32F415_Firmware_Library,
+              mcu: AT32F415RCT7,
+              ldscript: AT32F415xC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F421,
               git: ArteryTek/AT32F421_Firmware_Library,
               mcu: AT32F421C8T7,
               ldscript: AT32F421x8_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F423,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32F423_Firmware_Library,
+              mcu: AT32F423RCT7,
+              ldscript: AT32F423xC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F425,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32F425_Firmware_Library,
+              mcu: AT32F425C8T7,
+              ldscript: AT32F425x8_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F435,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32F435_437_Firmware_Library,
+              mcu: AT32F435ZDT7,
+              ldscript: AT32F435xM_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32F437,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32F435_437_Firmware_Library,
+              mcu: AT32F437ZDT7,
+              ldscript: AT32F437xM_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI1,
             }
           - {
               name: AT32WB415,
-              git: ArteryTek/AT32A403A_Firmware_Library,
-              mcu: AT32A403AVCT7,
-              ldscript: AT32A403AxC_FLASH.ld,
+              git: ArteryTek/AT32WB415_Firmware_Library,
+              mcu: AT32WB415CCU7_7,
+              ldscript: AT32WB415xC_FLASH.ld,
+              i2c: I2C1,
+              spi: SPI2,
             }
 
     steps:
@@ -137,10 +165,14 @@ jobs:
           NAME: ${{ matrix.name }}
           MCU: ${{ matrix.mcu }}
           LDSCRIPT: ${{ matrix.ldscript }}
+          I2C: ${{ matrix.i2c }}
+          SPI: ${{ matrix.spi }}
         run: make i2c
       - name: Build SPI
         env:
           NAME: ${{ matrix.name }}
           MCU: ${{ matrix.mcu }}
           LDSCRIPT: ${{ matrix.ldscript }}
+          I2C: ${{ matrix.i2c }}
+          SPI: ${{ matrix.spi }}
         run: make spi
