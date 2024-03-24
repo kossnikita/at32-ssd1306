@@ -56,7 +56,7 @@ define main
 void main(void){ssd1306_TestAll();while (1){}}
 endef
 
-main.c:
+main.c: ssd1306_conf.h
 	$(file > main.c,${main}) 
 
 %.elf : main.o $(OBJS)
