@@ -6,24 +6,7 @@ on:
   pull_request:
     branches: ["master"]
 
-env:
-  BUILD_TYPE: Release
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: apt packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install cppcheck
-      # - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
-      #   uses: carlosperate/arm-none-eabi-gcc-action@v1
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Cppcheck
-        run: cppcheck --enable=warning --platform=arm32-wchar_t4.xml --std=c++20 -I./include/ -i./build/ -DAT32F421=1 -DSSD1306_USE_SPI --library=gnu.cfg --error-exitcode=1 ${{github.workspace}}
   ci:
     runs-on: ubuntu-latest
     strategy:
@@ -143,6 +126,10 @@ jobs:
             }
 
     steps:
+      - name: apt packages
+        run: |
+          sudo apt update
+          sudo apt install cppcheck
       - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
         uses: carlosperate/arm-none-eabi-gcc-action@v1
       - name: Checkout code
@@ -160,6 +147,10 @@ jobs:
           find firmware -wholename */templates/inc/at32*_conf.h -exec cp '{}' . \;
           cp libs/ssd1306/.github/workflows/makefile .
           ls -fl
+      - name: Cppcheck I2C
+        run: cppcheck --enable=warning --platform=arm32-wchar_t4.xml --std=c++20 -I libs/ssd1306/include/ -i libs/ssd1306/examples -D${{ matrix.name }}=1 -DSSD1306_USE_I2C --library=gnu.cfg --error-exitcode=1 libs/ssd1306    
+      - name: Cppcheck SPI
+        run: cppcheck --enable=warning --platform=arm32-wchar_t4.xml --std=c++20 -I libs/ssd1306/include/ -i libs/ssd1306/examples -D${{ matrix.name }}=1 -DSSD1306_USE_SPI --library=gnu.cfg --error-exitcode=1 libs/ssd1306    
       - name: Build I2C
         env:
           NAME: ${{ matrix.name }}
