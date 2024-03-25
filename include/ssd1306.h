@@ -1,6 +1,7 @@
 /**
  * This Library was originally written by Olivier Van den Eede (4ilo) in 2016.
  * Some refactoring was done and SPI support was added by Aleksander Alekseev (afiskon) in 2018.
+ * Artery support by Nikita Koss (kossnikita) in 2024.
  *
  * https://github.com/afiskon/stm32-ssd1306
  */
@@ -104,12 +105,9 @@ _BEGIN_STD_C
 
 /* ^^^ SPI config ^^^ */
 
-#if defined(SSD1306_USE_I2C)
-// extern I2C_HandleTypeDef SSD1306_I2C_PORT;
-#elif defined(SSD1306_USE_SPI)
-// extern SPI_HandleTypeDef SSD1306_SPI_PORT;
-#else
-#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro!"
+#if !defined(SSD1306_USE_I2C) && !defined(SSD1306_USE_SPI)
+#define SSD1306_USE_I2C
+#warning "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro!"
 #endif
 
 // SSD1306 OLED height in pixels
@@ -126,8 +124,13 @@ _BEGIN_STD_C
 #define SSD1306_BUFFER_SIZE   SSD1306_WIDTH * SSD1306_HEIGHT / 8
 #endif
 
+#ifndef ssd1306_Delay
 #define ssd1306_Delay(x) ((void)0)
+#endif // !ssd1306_Delay
+
+#ifndef ssd1306_GetTick
 #define ssd1306_GetTick() 0
+#endif // !ssd1306_GetTick
 
 // Enumeration for screen colors
 typedef enum {

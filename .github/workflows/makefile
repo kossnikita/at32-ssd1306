@@ -33,7 +33,7 @@ SSD1306_FLAGS+= -DSSD1306_INCLUDE_FONT_16x24
 # Compilation Flags
 
 LDFLAGS= -T$(shell find libs -name ${LDSCRIPT}) -mthumb -mcpu=cortex-m4 --specs=nosys.specs -flto -Wl,--gc-sections -Wl,--no-warn-rwx-segments -Wall -Werror
-CFLAGS= -mcpu=cortex-m4 -mthumb --specs=nosys.specs -Os -Wall -Werror -fdata-sections -ffunction-sections 
+CFLAGS= -mcpu=cortex-m4 -mthumb --specs=nosys.specs -Wall -Werror -fdata-sections -ffunction-sections 
 CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I$(SSD1306)/include -I. 
 CFLAGS+= -D${MCU}
 CFLAGS+= $(SSD1306_FLAGS)

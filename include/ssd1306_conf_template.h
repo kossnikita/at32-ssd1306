@@ -1,33 +1,40 @@
 /**
  * Private configuration file for the SSD1306 library.
- * This example is configured for STM32F0, I2C and including all fonts.
  */
 
 #ifndef __SSD1306_CONF_H__
 #define __SSD1306_CONF_H__
 
 // Choose a microcontroller family
-#define STM32F0
-//#define STM32F1
-//#define STM32F4
-//#define STM32L0
-//#define STM32L1
-//#define STM32L4
-//#define STM32F3
-//#define STM32H7
-//#define STM32F7
-//#define STM32G0
+//#define AT32A403A
+//#define AT32F402
+//#define AT32F403
+//#define AT32F403A
+//#define AT32F405
+//#define AT32F407
+//#define AT32F413
+//#define AT32F415
+//#define AT32F421
+//#define AT32F423
+//#define AT32F425
+//#define AT32F435
+//#define AT32F437
+//#define AT32WB415
+
+// Provide Delay(ms) and GetTick() functions
+//#define ssd1306_Delay(x) delay_ms(x)
+//#define ssd1306_GetTick() SysTick->VAL
 
 // Choose a bus
 #define SSD1306_USE_I2C
 //#define SSD1306_USE_SPI
 
 // I2C Configuration
-#define SSD1306_I2C_PORT        hi2c1
+#define SSD1306_I2C_PORT        I2C1
 #define SSD1306_I2C_ADDR        (0x3C << 1)
 
 // SPI Configuration
-//#define SSD1306_SPI_PORT        hspi1
+//#define SSD1306_SPI_PORT        SPI1
 //#define SSD1306_CS_Port         OLED_CS_GPIO_Port
 //#define SSD1306_CS_Pin          OLED_CS_Pin
 //#define SSD1306_DC_Port         OLED_DC_GPIO_Port
