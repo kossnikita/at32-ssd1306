@@ -11,7 +11,7 @@ void ssd1306_Reset(void) { /* for I2C - do nothing */ }
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
 #if I2C_VERSION == 1
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
   i2c_master_receive_ack_set(SSD1306_I2C_PORT, I2C_MASTER_ACK_CURRENT);
   i2c_start_generate(SSD1306_I2C_PORT);
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STARTF_FLAG) == RESET);
@@ -24,14 +24,28 @@ void ssd1306_WriteCommand(uint8_t byte) {
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET);
   i2c_stop_generate(SSD1306_I2C_PORT);
 #elif I2C_VERSION == 2
-  (void)(byte);
+  /* wait for the busy flag to be reset */
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
+  /* start transfer */
+  i2c_transmit_set(SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 1, I2C_AUTO_STOP_MODE,
+                   I2C_GEN_START_WRITE);
+  /* wait for the tdis flag to be set */
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET);
+  /* send data */
+  i2c_data_send(SSD1306_I2C_PORT, byte);
+  /* wait for the stop flag to be set  */
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STOPF_FLAG) == RESET);
+  /* clear stop flag */
+  i2c_flag_clear(SSD1306_I2C_PORT, I2C_STOPF_FLAG);
+  /* reset ctrl2 register */
+  SSD1306_I2C_PORT->ctrl2 &= ~0x01FF17FF;
 #endif
 }
 
 // Send data
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
 #if I2C_VERSION == 1
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
   i2c_master_receive_ack_set(SSD1306_I2C_PORT, I2C_MASTER_ACK_CURRENT);
   i2c_start_generate(SSD1306_I2C_PORT);
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STARTF_FLAG) == RESET);
@@ -43,14 +57,30 @@ void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
   i2c_data_send(SSD1306_I2C_PORT, 0x40);
   while (buff_size > 0) {
     while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET);
+    /* send data */
     i2c_data_send(SSD1306_I2C_PORT, *buffer++);
     buff_size--;
   }
   while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET);
   i2c_stop_generate(SSD1306_I2C_PORT);
 #elif I2C_VERSION == 2
-  (void)(buffer);
-  (void)(buff_size);
+  /* wait for the busy flag to be reset */
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
+  /* start transfer */
+  i2c_transmit_set(SSD1306_I2C_PORT, SSD1306_I2C_ADDR, buff_size,
+                   I2C_AUTO_STOP_MODE, I2C_GEN_START_WRITE);
+  while (buff_size > 0) {
+    /* wait for the tdis flag to be set */
+    while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET);
+    /* send data */
+    i2c_data_send(SSD1306_I2C_PORT, *buffer++);
+  }
+  /* wait for the stop flag to be set  */
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STOPF_FLAG) == RESET);
+  /* clear stop flag */
+  i2c_flag_clear(SSD1306_I2C_PORT, I2C_STOPF_FLAG);
+  /* reset ctrl2 register */
+  SSD1306_I2C_PORT->ctrl2 &= ~0x01FF17FF;
 #endif
 }
 
