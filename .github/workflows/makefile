@@ -12,12 +12,14 @@ DEVICE=$(LIBROOT)/cmsis/cm4/device_support
 PERIPH=$(LIBROOT)/drivers
 SSD1306=$(LIBROOT)/ssd1306
 
+LIB_SRCS=$(wildcard libs/ssd1306/src/*.c)
 SRCS=$(wildcard libs/drivers/src/*.c)
-SRCS+=$(wildcard libs/ssd1306/src/*.c)
 SRCS+=$(wildcard libs/cmsis/cm4/device_support/system_*.c)
 SRCS+=$(wildcard libs/cmsis/cm4/device_support/startup/gcc/startup_*.s)
 
+LIB_OBJS=$(patsubst %.c,%.o,$(LIB_SRCS))
 OBJS=$(patsubst %.c,%.o,$(patsubst %.s,%.o,$(SRCS)))
+OBJS+=$(LIB_OBJS)
 
 # Library flags
 
@@ -32,11 +34,12 @@ SSD1306_FLAGS+= -DSSD1306_INCLUDE_FONT_16x24
 
 # Compilation Flags
 
-LDFLAGS= -T$(shell find libs -name ${LDSCRIPT}) -mthumb -mcpu=cortex-m4 --specs=nosys.specs -flto -Wl,--gc-sections -Wl,--no-warn-rwx-segments -Wall -Werror
-CFLAGS= -mcpu=cortex-m4 -mthumb --specs=nosys.specs -Wall -Werror -fdata-sections -ffunction-sections 
+LDFLAGS= -T$(shell find libs -name ${LDSCRIPT}) -mthumb -mcpu=cortex-m4 --specs=nosys.specs -flto -Wl,--gc-sections
+CFLAGS= -mcpu=cortex-m4 -mthumb --specs=nosys.specs -fdata-sections -ffunction-sections 
 CFLAGS+= -I$(DEVICE) -I$(CORE) -I$(PERIPH)/inc -I$(SSD1306)/include -I. 
 CFLAGS+= -D${MCU}
 CFLAGS+= $(SSD1306_FLAGS)
+LIB_CFLAGS = -Wall -Wextra -Wpedantic -Werror 
 
 # Build executable 
 
@@ -65,10 +68,18 @@ main.c: ssd1306_conf.h
 	$(file > main.c,${main}) 
 
 %.elf : main.o $(OBJS)
+	$(info SRCS: $(SRCS))
 	$(LD) $(LDFLAGS) -o $@ $< $(OBJS)
+
+$(LIB_OBJS): %.o: %.c
+	$(CC) -c $(CFLAGS) $(LIB_CFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 %.o: %.s
 	$(CC) -c $(CFLAGS) $< -o $@
+
+.PHONY: clean
+clean:
+	rm -f $(LIB_OBJS) $(OBJS) i2c.elf spi.elf
