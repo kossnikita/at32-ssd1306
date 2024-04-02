@@ -36,7 +36,6 @@ match args.charset:
         with open(args.charset, 'r', encoding='utf-8') as file:
             charset = file.read()
 charset = [char for char in charset]
-
 try:
     fnt = ImageFont.truetype(args.font, args.size)
 except OSError:
