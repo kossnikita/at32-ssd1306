@@ -330,10 +330,8 @@ void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
  * color    => Black or White
  */
 char ssd1306_WriteChar(char ch, SSD1306_Font_t Font, SSD1306_COLOR color) {
-  uint32_t i, b, j;
-
   // Check if character is valid
-  if (ch < 32 || ch > 126) return 0;
+  if (ch < ' ' || ch > '~') return 0;
 
   // Check remaining space on current line
   if (SSD1306_WIDTH < (SSD1306.CurrentX + Font.width) ||
@@ -343,19 +341,23 @@ char ssd1306_WriteChar(char ch, SSD1306_Font_t Font, SSD1306_COLOR color) {
   }
 
   // Use the font to write
-  for (i = 0; i < Font.height; i++) {
-    b = Font.data[(ch - 32) * Font.height + i];
-    for (j = 0; j < Font.width; j++) {
-      if ((b << j) & 0x8000) {
-        ssd1306_DrawPixel(SSD1306.CurrentX + j, (SSD1306.CurrentY + i),
-                          (SSD1306_COLOR)color);
-      } else {
-        ssd1306_DrawPixel(SSD1306.CurrentX + j, (SSD1306.CurrentY + i),
-                          (SSD1306_COLOR)!color);
+  uint32_t words_per_line = 1 + (Font.width - 1) / 16;
+  for (uint32_t y = 0; y < Font.height; y++) {
+    for (uint32_t i = 0; i < words_per_line; i++) {
+      uint32_t index =
+          (ch - ' ') * Font.height * words_per_line + y * words_per_line + i;
+      uint32_t b = Font.data[index];
+      for (uint32_t x = i * 16; x < Font.width; x++) {
+        if ((b << (x % 16)) & 0x8000) {
+          ssd1306_DrawPixel(SSD1306.CurrentX + x, (SSD1306.CurrentY + y),
+                            (SSD1306_COLOR)color);
+        } else {
+          ssd1306_DrawPixel(SSD1306.CurrentX + x, (SSD1306.CurrentY + y),
+                            (SSD1306_COLOR)!color);
+        }
       }
     }
   }
-
   // The current space is now taken
   SSD1306.CurrentX += Font.char_width ? Font.char_width[ch - 32] : Font.width;
 
