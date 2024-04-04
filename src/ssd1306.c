@@ -684,3 +684,27 @@ void ssd1306_SetDisplayOn(const uint8_t on) {
 }
 
 uint8_t ssd1306_GetDisplayOn() { return SSD1306.DisplayOn; }
+
+void ssd1306_InvertRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
+  if ((x1 > x2) || (y1 > y2)) {
+    return;
+  }
+  uint8_t i = 0;
+  if ((y1 / 8) != (y2 / 8)) {
+    for (uint8_t x = x1; x <= x2; x++) {
+      i = x + (y1 / 8) * SSD1306_WIDTH;
+      SSD1306_Buffer[i] ^= 0xFF << (y1 % 8);
+      for (i += SSD1306_WIDTH; i < x + (y2 / 8) * SSD1306_WIDTH;
+           i += SSD1306_WIDTH) {
+        SSD1306_Buffer[i] ^= 0xFF;
+      }
+      SSD1306_Buffer[i] ^= 0xFF >> (7 - (y2 % 8));
+    }
+  } else {
+    const uint8_t mask = (0xFF << (y1 % 8)) & (0xFF >> (7 - (y2 % 8)));
+    for (i = x1 + (y1 / 8) * SSD1306_WIDTH; i <= x2 + (y2 / 8) * SSD1306_WIDTH;
+         i++) {
+      SSD1306_Buffer[i] ^= mask;
+    }
+  }
+}
