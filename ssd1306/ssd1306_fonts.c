@@ -894,6 +894,9 @@ static const uint8_t char_width[] = {
 };
 #endif
 
+/** Generated Roboto Regular 17 */
+const SSD1306_Font_t Font_16x18 = {16, 18, Font16x18, char_width};
+
 #ifdef SSD1306_INCLUDE_FONT_6x8
 const SSD1306_Font_t Font_6x8 = {6, 8, Font6x8, NULL};
 #endif
