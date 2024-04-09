@@ -1,18 +1,39 @@
 #include "ssd1306.h"
 
 #include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>  // For memcpy
 
 #if defined(SSD1306_USE_I2C)
 
-void ssd1306_Reset(void) { /* for I2C - do nothing */ }
+void ssd1306_Reset(void) { /* for I2C - do nothing */
+}
+
+#if I2C_VERSION == 1
+static bool ssd1306_CheckError(void) {
+  if (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSERR_FLAG) ||
+      i2c_flag_get(SSD1306_I2C_PORT, I2C_ARLOST_FLAG) ||
+      i2c_flag_get(SSD1306_I2C_PORT, I2C_ACKFAIL_FLAG) ||
+      i2c_flag_get(SSD1306_I2C_PORT, I2C_OUF_FLAG) ||
+      i2c_flag_get(SSD1306_I2C_PORT, I2C_PECERR_FLAG)) {
+    i2c_reset(SSD1306_I2C_PORT);
+    i2c_init(I2C2, I2C_FSMODE_DUTY_2_1, 400000);
+    i2c_enable(I2C2, TRUE);
+    return true;
+  }
+  return false;
+}
+#endif
 
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
 #if I2C_VERSION == 1
   /* wait for the busy flag to be reset */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET)
+    if (ssd1306_CheckError()) {
+      return;
+    }
   /* ack acts on the current byte */
   i2c_master_receive_ack_set(SSD1306_I2C_PORT, I2C_MASTER_ACK_CURRENT);
 
@@ -20,41 +41,63 @@ void ssd1306_WriteCommand(uint8_t byte) {
   /* generate start condtion */
   i2c_start_generate(SSD1306_I2C_PORT);
   /* wait for the start flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STARTF_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STARTF_FLAG) == RESET)
+    if (ssd1306_CheckError()) {
+      return;
+    }
   /* send slave address */
   i2c_7bit_address_send(SSD1306_I2C_PORT, SSD1306_I2C_ADDR,
                         I2C_DIRECTION_TRANSMIT);
   /* wait for the addr7 flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_ADDR7F_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_ADDR7F_FLAG) == RESET)
+    if (ssd1306_CheckError()) {
+      return;
+    }
   /* clear addr flag */
   i2c_flag_clear(SSD1306_I2C_PORT, I2C_ADDR7F_FLAG);
   /* wait for the tdbe flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET) {
+    if (ssd1306_CheckError()) {
+      return;
+    }
+  }
   /* send memory address */
   i2c_data_send(SSD1306_I2C_PORT, 0x00);
   /* wait for the tdbe flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET) {
+    if (ssd1306_CheckError()) {
+      return;
+    }
+  }
   /* send data */
   i2c_data_send(SSD1306_I2C_PORT, byte);
   /* wait for the tdc flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET) {
+    if (ssd1306_CheckError()) {
+      return;
+    }
+  }
   i2c_stop_generate(SSD1306_I2C_PORT);
 #elif I2C_VERSION == 2
   /* wait for the busy flag to be reset */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET)
+    ;
   /* start transfer */
   i2c_transmit_set(SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 1, I2C_AUTO_STOP_MODE,
                    I2C_GEN_START_WRITE);
   /* wait for the tdis flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET)
+    ;
   /* send memory address */
   i2c_data_send(SSD1306_I2C_PORT, 0x00);
   /* wait for the tdis flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET)
+    ;
   /* send data */
   i2c_data_send(SSD1306_I2C_PORT, byte);
   /* wait for the stop flag to be set  */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STOPF_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STOPF_FLAG) == RESET)
+    ;
   /* clear stop flag */
   i2c_flag_clear(SSD1306_I2C_PORT, I2C_STOPF_FLAG);
   /* reset ctrl2 register */
@@ -66,7 +109,10 @@ void ssd1306_WriteCommand(uint8_t byte) {
 void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
 #if I2C_VERSION == 1
   /* wait for the busy flag to be reset */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET)
+    if (ssd1306_CheckError()) {
+      return;
+    }
   /* ack acts on the current byte */
   i2c_master_receive_ack_set(SSD1306_I2C_PORT, I2C_MASTER_ACK_CURRENT);
 
@@ -74,46 +120,68 @@ void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
   /* generate start condtion */
   i2c_start_generate(SSD1306_I2C_PORT);
   /* wait for the start flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STARTF_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STARTF_FLAG) == RESET)
+    if (ssd1306_CheckError()) {
+      return;
+    }
   /* send slave address */
   i2c_7bit_address_send(SSD1306_I2C_PORT, SSD1306_I2C_ADDR,
                         I2C_DIRECTION_TRANSMIT);
   /* wait for the addr7 flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_ADDR7F_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_ADDR7F_FLAG) == RESET)
+    if (ssd1306_CheckError()) {
+      return;
+    }
   /* clear addr flag */
   i2c_flag_clear(SSD1306_I2C_PORT, I2C_ADDR7F_FLAG);
   /* wait for the tdbe flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET) {
+    if (ssd1306_CheckError()) {
+      return;
+    }
+  }
   /* send memory address */
   i2c_data_send(SSD1306_I2C_PORT, 0x40);
   while (buff_size > 0) {
     /* wait for the tdbe flag to be set */
-    while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET);
+    while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDBE_FLAG) == RESET) {
+      if (ssd1306_CheckError()) {
+        return;
+      }
+    }
     /* send data */
     i2c_data_send(SSD1306_I2C_PORT, *buffer++);
     buff_size--;
   }
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDC_FLAG) == RESET) {
+    if (ssd1306_CheckError()) {
+      return;
+    }
+  }
   i2c_stop_generate(SSD1306_I2C_PORT);
 #elif I2C_VERSION == 2
   /* wait for the busy flag to be reset */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_BUSYF_FLAG) != RESET)
+    ;
   /* start transfer */
   i2c_transmit_set(SSD1306_I2C_PORT, SSD1306_I2C_ADDR, buff_size + 1,
                    I2C_AUTO_STOP_MODE, I2C_GEN_START_WRITE);
   /* wait for the tdis flag to be set */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET)
+    ;
   /* send memory address */
   i2c_data_send(SSD1306_I2C_PORT, 0x40);
   while (buff_size > 0) {
     /* wait for the tdis flag to be set */
-    while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET);
+    while (i2c_flag_get(SSD1306_I2C_PORT, I2C_TDIS_FLAG) == RESET)
+      ;
     /* send data */
     i2c_data_send(SSD1306_I2C_PORT, *buffer++);
     buff_size--;
   }
   /* wait for the stop flag to be set  */
-  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STOPF_FLAG) == RESET);
+  while (i2c_flag_get(SSD1306_I2C_PORT, I2C_STOPF_FLAG) == RESET)
+    ;
   /* clear stop flag */
   i2c_flag_clear(SSD1306_I2C_PORT, I2C_STOPF_FLAG);
   /* reset ctrl2 register */
@@ -138,7 +206,8 @@ void ssd1306_Reset(void) {
 void ssd1306_WriteCommand(uint8_t byte) {
   gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, FALSE);  // select OLED
   gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, FALSE);  // command
-  while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET);
+  while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET)
+    ;
   spi_i2s_data_transmit(SSD1306_SPI_PORT, (uint16_t)byte);
   gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin,
                   TRUE);  // un-select OLED
@@ -149,7 +218,8 @@ void ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
   gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, FALSE);  // select OLED
   gpio_bits_write(SSD1306_DC_Port, SSD1306_DC_Pin, TRUE);   // data
   for (uint32_t i = 0; i < buff_size; i++) {
-    while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET);
+    while (spi_i2s_flag_get(SSD1306_SPI_PORT, SPI_I2S_TDBE_FLAG) == RESET)
+      ;
     spi_i2s_data_transmit(SSD1306_SPI_PORT, (uint16_t)buffer[i]);
   }
   gpio_bits_write(SSD1306_CS_Port, SSD1306_CS_Pin, TRUE);  // un-select OLED
@@ -685,26 +755,33 @@ void ssd1306_SetDisplayOn(const uint8_t on) {
 
 uint8_t ssd1306_GetDisplayOn() { return SSD1306.DisplayOn; }
 
-void ssd1306_InvertRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2) {
-  if ((x1 > x2) || (y1 > y2)) {
-    return;
+SSD1306_Error_t ssd1306_InvertRectangle(uint8_t x1, uint8_t y1, uint8_t x2,
+                                        uint8_t y2) {
+  if ((x2 >= SSD1306_WIDTH) || (y2 >= SSD1306_HEIGHT)) {
+    return SSD1306_ERR;
   }
-  uint8_t i = 0;
+  if ((x1 > x2) || (y1 > y2)) {
+    return SSD1306_ERR;
+  }
+  uint32_t i;
   if ((y1 / 8) != (y2 / 8)) {
-    for (uint8_t x = x1; x <= x2; x++) {
+    /* if rectangle doesn't lie on one 8px row */
+    for (uint32_t x = x1; x <= x2; x++) {
       i = x + (y1 / 8) * SSD1306_WIDTH;
       SSD1306_Buffer[i] ^= 0xFF << (y1 % 8);
-      for (i += SSD1306_WIDTH; i < x + (y2 / 8) * SSD1306_WIDTH;
-           i += SSD1306_WIDTH) {
+      i += SSD1306_WIDTH;
+      for (; i < x + (y2 / 8) * SSD1306_WIDTH; i += SSD1306_WIDTH) {
         SSD1306_Buffer[i] ^= 0xFF;
       }
       SSD1306_Buffer[i] ^= 0xFF >> (7 - (y2 % 8));
     }
   } else {
+    /* if rectangle lies on one 8px row */
     const uint8_t mask = (0xFF << (y1 % 8)) & (0xFF >> (7 - (y2 % 8)));
-    for (i = x1 + (y1 / 8) * SSD1306_WIDTH; i <= x2 + (y2 / 8) * SSD1306_WIDTH;
-         i++) {
+    for (i = x1 + (y1 / 8) * SSD1306_WIDTH;
+         i <= (uint32_t)x2 + (y2 / 8) * SSD1306_WIDTH; i++) {
       SSD1306_Buffer[i] ^= mask;
     }
   }
+  return SSD1306_OK;
 }
