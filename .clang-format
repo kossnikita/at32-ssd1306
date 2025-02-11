@@ -7,4 +7,5 @@ AlignTrailingComments:
   Kind: Always
   OverEmptyLines: 2
 PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: false
 ...

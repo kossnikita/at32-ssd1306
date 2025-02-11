@@ -5,7 +5,9 @@
 
 #if defined(SSD1306_USE_I2C)
 
-void ssd1306_Reset(void) { /* for I2C - do nothing */ }
+void ssd1306_Reset(void) {
+    /* for I2C - do nothing */
+}
 
 // Send a byte to the command register
 void ssd1306_WriteCommand(uint8_t byte) {
@@ -316,7 +318,9 @@ void ssd1306_Polyline(const SSD1306_VERTEX* par_vertex, uint16_t par_size, SSD13
 }
 
 /* Convert Degrees to Radians */
-static float ssd1306_DegToRad(float par_deg) { return par_deg * (3.14f / 180.0f); }
+static float ssd1306_DegToRad(float par_deg) {
+    return par_deg * (3.14f / 180.0f);
+}
 
 /* Normalize degree to [0;360] */
 static uint16_t ssd1306_NormalizeTo0_360(uint16_t par_deg) {
@@ -587,4 +591,6 @@ void ssd1306_SetDisplayOn(const uint8_t on) {
     ssd1306_WriteCommand(value);
 }
 
-uint8_t ssd1306_GetDisplayOn() { return SSD1306.DisplayOn; }
+uint8_t ssd1306_GetDisplayOn() {
+    return SSD1306.DisplayOn;
+}
