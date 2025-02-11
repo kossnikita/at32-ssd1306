@@ -151,8 +151,8 @@ typedef struct {
 typedef struct {
     const uint8_t width;             /**< Font width in pixels */
     const uint8_t height;            /**< Font height in pixels */
-    const uint16_t *const data;      /**< Pointer to font data array */
-    const uint8_t *const char_width; /**< Proportional character width in pixels
+    const uint16_t* const data;      /**< Pointer to font data array */
+    const uint8_t* const char_width; /**< Proportional character width in pixels
                                       * (NULL for monospaced) */
 } SSD1306_Font_t;
 
@@ -162,7 +162,7 @@ void ssd1306_Fill(SSD1306_COLOR color);
 void ssd1306_UpdateScreen(void);
 void ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);
 char ssd1306_WriteChar(char ch, SSD1306_Font_t Font, SSD1306_COLOR color);
-char ssd1306_WriteString(char *str, SSD1306_Font_t Font, SSD1306_COLOR color);
+char ssd1306_WriteString(char* str, SSD1306_Font_t Font, SSD1306_COLOR color);
 void ssd1306_SetCursor(uint8_t x, uint8_t y);
 void ssd1306_Line(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SSD1306_COLOR color);
 void ssd1306_DrawArc(uint8_t x, uint8_t y, uint8_t radius, uint16_t start_angle, uint16_t sweep,
@@ -171,7 +171,7 @@ void ssd1306_DrawArcWithRadiusLine(uint8_t x, uint8_t y, uint8_t radius, uint16_
                                    uint16_t sweep, SSD1306_COLOR color);
 void ssd1306_DrawCircle(uint8_t par_x, uint8_t par_y, uint8_t par_r, SSD1306_COLOR color);
 void ssd1306_FillCircle(uint8_t par_x, uint8_t par_y, uint8_t par_r, SSD1306_COLOR par_color);
-void ssd1306_Polyline(const SSD1306_VERTEX *par_vertex, uint16_t par_size, SSD1306_COLOR color);
+void ssd1306_Polyline(const SSD1306_VERTEX* par_vertex, uint16_t par_size, SSD1306_COLOR color);
 void ssd1306_DrawRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SSD1306_COLOR color);
 void ssd1306_FillRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SSD1306_COLOR color);
 
@@ -186,7 +186,7 @@ void ssd1306_FillRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2, SSD13
  */
 SSD1306_Error_t ssd1306_InvertRectangle(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2);
 
-void ssd1306_DrawBitmap(uint8_t x, uint8_t y, const unsigned char *bitmap, uint8_t w, uint8_t h,
+void ssd1306_DrawBitmap(uint8_t x, uint8_t y, const unsigned char* bitmap, uint8_t w, uint8_t h,
                         SSD1306_COLOR color);
 
 /**
@@ -213,8 +213,8 @@ uint8_t ssd1306_GetDisplayOn();
 // Low-level procedures
 void ssd1306_Reset(void);
 void ssd1306_WriteCommand(uint8_t byte);
-void ssd1306_WriteData(uint8_t *buffer, size_t buff_size);
-SSD1306_Error_t ssd1306_FillBuffer(uint8_t *buf, uint32_t len);
+void ssd1306_WriteData(uint8_t* buffer, size_t buff_size);
+SSD1306_Error_t ssd1306_FillBuffer(uint8_t* buf, uint32_t len);
 
 _END_STD_C
 
